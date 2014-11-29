@@ -7,10 +7,12 @@ function [ sys ] = init_dyn_sys( m, n, p )
 %
 %   OUTPUTS: sys = MATLAB structure containing A, B, C, D empty matrices
 %   initialized with zeros based on the system dimensionality
-
-sys.A = zeros(n,n);
-sys.B = zeros(n,m);
-sys.C = zeros(p,n);
-sys.D = zeros(p,m);
+    sys.m = m;   % number of inputs
+    sys.n = n;   % number of states
+    sys.p = p;   % number of outputs
+    sys.A = zeros(n,n);
+    sys.B = zeros(n,m);
+    sys.C = zeros(p,n);
+    sys.D = zeros(p,m);
 end
 
