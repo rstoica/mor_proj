@@ -72,7 +72,7 @@ function [ sys_red, res ] = bal_reduce( sys, tol )
     end
     fprintf('Balanced truncation done at order %.0f ot of %.0f\n',res.k,sys.n);
     % reduce new system to dimension k
-    sys_red = init_dyn_sys(sys.m,res.k,sys.p,'Bal. Red.');
+    sys_red = init_dyn_sys(sys.m,res.k,sys.p,strcat('Bal. Red. ',num2str(res.k)));
     % first transform A, B, C, D and then truncate to k
     sys_red.A = res.T*sys.A*res.Ti;
     sys_red.B = res.T*sys.B;

@@ -44,7 +44,7 @@ function [ sys_red, res ] = mod_reduce( sys, tol )
         res.k = 1;
     end
     fprintf('Modal approximation done at order %.0f ot of %.0f\n',res.k,sys.n);
-    sys_red = init_dyn_sys(sys.m,res.k,sys.p,'Mod. Red.');
+    sys_red = init_dyn_sys(sys.m,res.k,sys.p,strcat('Mod. Red. ',num2str(res.k)));
     sys_red.A = diag(poles(1:res.k));
     sys_red.B = res.BT(1:res.k,:);
     sys_red.C = res.CT(:,1:res.k);
