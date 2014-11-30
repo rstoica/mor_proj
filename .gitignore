@@ -1,1 +1,4 @@
 *.asv
+*.log
+*.aux
+report/STOICA_proj.synctex.*
