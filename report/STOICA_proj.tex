@@ -4,10 +4,11 @@
 \usepackage{amsfonts}
 \usepackage{amssymb}
 \usepackage{graphicx}
-\usepackage{geometry}
+\usepackage[left=2cm,right=2cm]{geometry}
 \usepackage{float}
 \usepackage{caption}
 \usepackage[hidelinks=true]{hyperref}
+\usepackage{lscape}
 
 \title{\bf Model Order Reduction \\ Power Grid Circuit Reduction \\ Final Course Project}
 \author{\bf Razvan-Andrei Stoica}
@@ -34,7 +35,7 @@ Model reduction is an essential analysis tool of complex dynamical systems. In t
 \caption{Power grid model circuit to study (3 layers)}\label{fig:circ}
 \end{figure}
 
-We started by firstly determining the state space representation of the circuit's underlying dynamic system. In doing so, Kirchhoff's laws were applied and hence we obtained  the following system's equations (\ref{eq:sys}).
+We started by firstly determining the state space representation of the circuit's underlying dynamic system. In doing so, Kirchhoff's laws were applied, and hence, we obtained  the following equations (\ref{eq:sys}).
 
 \begin{eqnarray}\label{eq:sys}
 \left\lbrace\begin{array}{c | c}
@@ -51,8 +52,118 @@ C\dot{x_{13}} = -\frac{x_{13}}{R_{13}} + x_{12} - x_{14} + x_{16} + \frac{u}{R_{
 \end{array}\right.
 \end{eqnarray}
 
+Rewriting equations (\ref{eq:sys}) in state-space form
+
+\begin{eqnarray}
+\begin{array}{c c}
+\dot{\textbf{x}} = & A \textbf{x} + B \textbf{u}\\
+\textbf{y} = & C\textbf{x} +  D\textbf{u},\nonumber
+\end{array}
+\end{eqnarray}
+
+we obtained the following input, state and output column vectors
+
+\begin{equation}
+\textbf{u} = \left(I_1, I_2, I_3, \dots, I_7, V_{DD}\right)^T\nonumber
+\end{equation}
+
+\begin{equation}
+\textbf{x} = \left(x_1, x_2, x_3, \dots, x_{16}, x_{17}\right)^T\nonumber
+\end{equation}
+
+\begin{equation}
+\textbf{y} = \left(y_1, y_2, y_3, \dots, y_{7}\right)^T\nonumber
+\end{equation}
+using the same notation introduced in Figure (\ref{fig:circ}) for the input, and respectively, for the state vectors, while the output was just defined as a $7$-length vector in order to outline the dimensionality of the system. Hence, it was clear that our dynamic system had $m = 8$ inputs, $n = 17$ states and $p = 7$ outputs. Furthermore, the matrices $A, B, C$ and $D $ which defined the system are shown in (\ref{eq:A})-(\ref{eq:D}). 
+
+\begin{landscape}
+\begin{equation}\label{eq:A}
+A =\left(\begin{array}{c c c c c c c c c c c c c c c c c c}
+-\frac{1}{R_1} & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 1 & 0 & 0\\
+1 & -R_2 & -1 & 0 & 0& 0 & 0 & 0& 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0\\
+0 & 1 & -\frac{1}{R_3} & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &-1 & 0  \\
+0 & 0 & 1 & -R_4 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &0 & 0& 0& 0& 0\\
+0& 0 & 0 & 1 & -\frac{1}{R_5} & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &0 & 0& 0& -1\\
+0& 0 & 0 & 0 & 1& -R_6 & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &0 & 0& 0\\
+0& 0 & 0 & 0 & 0 & 1& -\frac{1}{R_7} & -1 & 0 & 0 & 0 & 0 & 0 & 0 & 0 &0 & 0\\
+0& 0 & 0 & 0 & 0 & 0& 1& -{R_8} & -1  & 0 & 0 & 0 & 0 & 0 & 0 &0 & 0\\
+0& 0 & 0 & 0 & 0 & 0& 0& 1& -\frac{1}{R_9} & -1  & 0 & 0 & 0 & 0 & 0 &0 & 0\\
+0& 0 & 0 & 0 & 0 & 0& 0& 0& 1& -{R_{10}} & -1  & 0 & 0 & 0 & 0 &0 & 0\\
+0& 0 & 0 & 0 & 0 & 0& 0& 0& 0 & 1& -\frac{1}{R_{11}} & -1  & 0 & 0 & 0 & 0 &1 \\
+0& 0 & 0 & 0 & 0 & 0& 0& 0& 0 & 0& 1& -{R_{12}} & -1  & 0 & 0 & 0 & 0 \\
+0& 0 & 0 & 0 & 0 & 0& 0& 0& 0 & 0& 0& 1& -\frac{1}{R_{13}} & -1  & 0 & 1 & 0 \\
+0& 0 & 0 & 0 & 0 & 0& 0& 0& 0 & 0& 0& 0& 1& -{R_{14}} & 0 & 0 & 0 \\
+-1& 0 & 0 & 0 & 0 & 0& 0& 0& 0 & 0& 0& 0& 0& 0& -{R_{15}} & 0 & 0 \\
+0& 0 & 1 & 0 & 0 & 0& 0& 0& 0 & 0& 0& 0& -1& 0& 0& -{R_{16}} & 0 \\
+0& 0 & 0 & 0 & 1 & 0& 0& 0& 0 & 0& -1& 0& 0& 0& 0& 0& -{R_{17}} \\
+\end{array}\right)
+\end{equation}
+
+\begin{equation}\label{eq:B}
+B = \left(\begin{array}{c c c c c c c c c c c c c c c c c}
+-1 & 0& 0 & 0 & 0 & 0& 0& 0& 0& 0 & 0 & 0 & 0& 0& 0& 0& 0 \\
+0 & 0& -1 & 0 & 0 & 0& 0& 0& 0& 0 & 0 & 0 & 0& 0& 0& 0& 0 \\
+0 & 0& 0 & 0 & -1 & 0& 0& 0& 0& 0 & 0 & 0 & 0& 0& 0& 0& 0 \\
+0 & 0& 0 & 0 & 0 & 0& -1& 0& 0& 0 & 0 & 0 & 0& 0& 0& 0& 0 \\
+0 & 0& 0 & 0 & 0 & 0& 0& 0& -1& 0 & 0 & 0 & 0& 0& 0& 0& 0 \\
+0 & 0& 0 & 0 & 0 & 0& 0& 0& 0& 0 & -1 & 0 & 0& 0& 0& 0& 0 \\
+0 & 0& 0 & 0 & 0 & 0& 0& 0& 0& 0 & 0 & 0 & -1& 0& 0& 0& 0 \\
+-\frac{1}{R_1} & 0& -\frac{1}{R_3} & 0 & -\frac{1}{R_5} & 0& -\frac{1}{R_7}& 0& -\frac{1}{R_{11}}& 0 & -\frac{1}{R_{13}} & 0 & 0& 0& 0& 0& 0 \\
+\end{array}\right)^T
+\end{equation}
+
+\begin{equation}\label{eq:C}
+C = B(:,1:7)',
+\end{equation}
+using MATLAB notation.
+
+\begin{equation}\label{eq:D}
+D = \text{zeros}(7,8),
+\end{equation}
+using MATLAB notation
+\end{landscape}
+
+It is easy to see that the sparse system matrix $A$ maintains the structure of the one representing the two-layered system we initially started with. This is an expected result common for such grid circuits.
+
+Finally, before starting our analysis for reduction, we considered the values
+$C_i = L_j = 1$ in their expected unit of measure, and respectively, $R_1 = R_{13} = 0.01 \Omega$, $R_2 =  R_4 = R_6 = R_8 = R_{10} = R_{12} = R_{14} = 2\Omega$ and $R_3  = R_5 = R_7 = R_9 = R_{11} = 100 \Omega$, $R_{15} = R_{16} = 3 \Omega$, and $R_{17} = 4 \Omega$, extrapolating the example given in \cite{task}. As a consequence, we found and defined our system to work with.
+
+\section{Model reduction methods}
+Having found the state space representation of our system, we proceeded with the model reduction using two methods: \textit{balanced truncation} and \textit{modal approximation}. In the following subsection a short theoretical background on the two methods is given together with the algorithms we used to obtain the reduction on our system using MATLAB.
+
+\subsection{Balanced truncation}
+Any linear dynamic system $\Sigma := (A,B,C,D)$ can be transformed to a balanced representation $\Sigma_{bal} := (T_{bal}AT^{-1}_{bal},T_{bal}B,CT_{bal}^{-1},D)$, where the infinite controllability, and respectively, observability Grammians are of the original system transform by congruence to diagonal and equal, i.e. "balanced", matrices, $T_{bal}PT_{bal}* =: P_{bal} = Q_{bal} := T_{bal}^{-*}QT_{bal}^{-1}$. 
+
+Moreover, the diagonal entries of $P_{bal}, Q_{bal}$, $\sigma_1 \geq \sigma_2 \geq  ... \geq \sigma_n\geq 0$ are the Hankel singular values of the system (eigenvalues of the product matrix $PQ$) and they order simultaneously the reachable and observable states of the system quantitatively such that the most reachable state is at the same time also the most observable. Consequently, this yields a high quality reduction capability and this is achieved by simply discarding the Hankel singular values that  fall under a certain threshold. Furthermore, balanced truncation up to an order $k \leq n$ returns a reduced system which is controllable ($\sigma_k > 0$), observable ($\sigma_k > 0$) and stable (stability of original system preserved through similarity transform of matrix $A$).
+
+The procedure to determine the balancing transformation matrix $T_{bal}$ is as follows:
+\begin{itemize}
+\item [1.] if system $\Sigma$ is stable
+\item [2.] \hspace{0.3cm} compute infinite Gramian controllability matrix $P$ as solution to Lyapunov's equation $$AP^T+PA^T+BB^T = 0$$
+\item [3.] \hspace{0.3cm} compute infinite Gramian observability matrix $Q$ as solution to Lyapunov's equation $$A^TQ+Q^TA+C^TC = 0$$
+\item [4.]\hspace{0.3cm} solve EVD of $$Q^{\frac{1}{2}}PQ^{\frac{1}{2}} = VH_DV^*,$$ and get the squared Hankel singular values as descendingly ordered diagonal entries in $H_D$ and $V$ the transformation matrix.
+\item[5.] \hspace{0.3cm} determine the balancing transformation matrix $$T_{bal} = H_D^{-\frac{1}{4}}V^*Q^{\frac{1}{2}}$$ and transform $(A,B,C,D) \rightarrow (A_{bal}, B_{bal}, C_{bal}, D_{bal})$.
+\item[6.] \hspace{0.3cm} pick truncation order $k$ such that $\sigma_k \geq t$, where $t$ is a considered threshold for truncation, and then, truncate such that $A^k_{bal} := A_{bal}(1:k,1:k)$, $B^k_{bal} := B_{bal}(1:k,:)$, $C^k_{bal} := C_{bal}(:,1:k)$, $D^k_{bal}:=D_{bal}$ in MATLAB notation.   
+\end{itemize}
+
+\subsection{Modal approximation}
+Any linear dynamic system $\Sigma := (A,B,C,D)$ with a diagonalizable matrix $A$ can be transformed to a modal representation $\Sigma_{mod}:=(\Lambda_A,B_{mod},C_{mod},D_{mod})$, where $\Lambda_A$ is the diagonalized transformation of $A$, i.e $A = V\Lambda_AV^{-1}$ with, and respectively $B_{mod} := V^{-1}B$, $C_{mod} := CV$, $D_{mod} := D$. We consider the diagonalization to sort the eigenvalues ascendingly after their real part, such that for a stable system, i.e. $\text{Re}(\lambda_i )_{i=1,...,n}<0$, $0 \leq \text{Re}(\lambda_1)  \leq \text{Re}(\lambda_2) \leq ... \leq \text{Re}(\lambda_n)$. In this case, since the frequency modes of the systems are preserved and sorted, we could exclude the ones having a small influence, obtaining an approximation which maintains stability of the original system.
+
+The reduction is performed based not only on the real parts of the eigenvalues, but also the influence of the residuals coming from the frequency response is taken into consideration for a lower approximation error, hence we sort the values $\frac{\textbf{c}_{mod,1}\textbf{b}_{mod,1}^T}{\text{Re}(\lambda_i)}_{i=1,...,n}$, with $\textbf{c}_{mod,1}, \textbf{b}_{mod,1}$ column vectors in $C_{mod}$,  and respectively $B_{mod}$ and then pick the $k^{th}$ of them highest than a certain threshold. Consequently we approximate the system with a $k$-order one with same dominant modal properties.
+
+The procedure to achieve modal truncation that we implemented in MATLAB is summarized below:
+\begin{itemize}
+\item [1.] solve the eigenvalue, eigenvector problem for $A$, i.e. $$ A = V\Lambda_AV^{-1}$$
+\item [2.] compute the modal transformed equivalent system $\Sigma_mod$ using $V$
+\item [3.] compute the coefficients $$\frac{\textbf{c}_{mod,1}\textbf{b}_{mod,1}^T}{\text{Re}(\lambda_i)}_{i=1,...,n}$$ and sort them ascendingly.
+\item [4.] pick the $k$ best coefficients and their corresponding eigenvalues and extract the corresponding matrices $A_{mod}^k$, $B_{mod}^k$, $C_{mod}^k$ by either recomputing with shuffled $V$ or by mere extraction of columns / rows.
+\end{itemize}
+
+\section{Model analysis \& reduction}
+In our analysis of the model introduced in Section 1, we used both methods summarized in Section 2 for different thresholds levels such as: $10^{-2}, 0.5\cdot10^{-2}, 10^{-3}$. The most interesting results and their comparisons are presented below, while the conclusions are drawn in the end.
+
 \begin{thebibliography}{3}
-\bibitem {aa} A. Antoulas, Lecture Notes Model Order Reduction Course, Fall 2014, Jacobs University Bremen.7
-\bibitem {task} A. Antoulas, Project task formulation , Model Order Reduction Course, Fall 2014, Jacobs University Bremen.
+\bibitem {aa} A. Antoulas, Lecture Notes Model Order Reduction Course, Fall 2014, Jacobs University Bremen.
+\bibitem {task} A. Antoulas, Project guide , Model Order Reduction Course, Fall 2014, Jacobs University Bremen.
 \end{thebibliography}
 \end{document}
