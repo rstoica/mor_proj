@@ -94,14 +94,17 @@ mod_poles_plot = [real(sys_mod.poles),imag(sys_mod.poles)];
 pfig = figure(2);
 hold on
 grid on 
-plot(poles_plot(:,1),poles_plot(:,2),'ko','MarkerSize',12,'LineWidth',2,'MarkerFaceColor','b');
-plot(bal_poles_plot(:,1),bal_poles_plot(:,2),'ko','MarkerSize',8,'LineWidth',2,'MarkerFaceColor','r');
+plot(poles_plot(:,1),poles_plot(:,2),'ko','MarkerSize',15,'LineWidth',2,'MarkerFaceColor','b');
+plot(bal_poles_plot(:,1),bal_poles_plot(:,2),'ko','MarkerSize',12,'LineWidth',2,'MarkerFaceColor','r');
 plot(mod_poles_plot(:,1),mod_poles_plot(:,2),'ko','MarkerSize',8,'LineWidth',2,'MarkerFaceColor','y');
 legend('Original Sys','Bal. Trunc. System','Mod. Trunc. System','Location','NorthWest');
-plot(zeros(1,50),linspace(-100,0.5,50),'k--');
-plot(linspace(-2.5,2.5,50),zeros(1,50),'k--');
+plot(zeros(1,50),linspace(-2,2,50),'k--');
+plot(linspace(-100,0.5,50),zeros(1,50),'k--');
 xlim([-100 0.5]);
 ylim([-2 2]);
+title('Poles of the original system vs. poles of approx. systems');
+xlabel('real axis');
+ylabel('imaginary axis');
 pause()
 xlim([-4 0.5]);
 
