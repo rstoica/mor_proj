@@ -7,6 +7,7 @@
 \usepackage[left=2cm,right=2cm]{geometry}
 \usepackage{float}
 \usepackage{caption}
+\usepackage{subcaption}
 \usepackage[hidelinks=true]{hyperref}
 \usepackage{lscape}
 
@@ -149,21 +150,76 @@ The procedure to determine the balancing transformation matrix $T_{bal}$ is as f
 \subsection{Modal approximation}
 Any linear dynamic system $\Sigma := (A,B,C,D)$ with a diagonalizable matrix $A$ can be transformed to a modal representation $\Sigma_{mod}:=(\Lambda_A,B_{mod},C_{mod},D_{mod})$, where $\Lambda_A$ is the diagonalized transformation of $A$, i.e $A = V\Lambda_AV^{-1}$ with, and respectively $B_{mod} := V^{-1}B$, $C_{mod} := CV$, $D_{mod} := D$. We consider the diagonalization to sort the eigenvalues ascendingly after their real part, such that for a stable system, i.e. $\text{Re}(\lambda_i )_{i=1,...,n}<0$, $0 \leq \text{Re}(\lambda_1)  \leq \text{Re}(\lambda_2) \leq ... \leq \text{Re}(\lambda_n)$. In this case, since the frequency modes of the systems are preserved and sorted, we could exclude the ones having a small influence, obtaining an approximation which maintains stability of the original system.
 
-The reduction is performed based not only on the real parts of the eigenvalues, but also the influence of the residuals coming from the frequency response is taken into consideration for a lower approximation error, hence we sort the values $\frac{\textbf{c}_{mod,1}\textbf{b}_{mod,1}^T}{\text{Re}(\lambda_i)}_{i=1,...,n}$, with $\textbf{c}_{mod,1}, \textbf{b}_{mod,1}$ column vectors in $C_{mod}$,  and respectively $B_{mod}$ and then pick the $k^{th}$ of them highest than a certain threshold. Consequently we approximate the system with a $k$-order one with same dominant modal properties.
+The reduction is performed based not only on the real parts of the eigenvalues, but also the influence of the residuals coming from the frequency response is taken into consideration for a lower approximation error, hence we sort the values $\frac{\textbf{c}_{mod,i}\textbf{b}_{mod,i}^T}{\text{Re}(\lambda_i)}_{i=1,...,n}$, with $\textbf{c}_{mod,i}, \textbf{b}_{mod,i}$ taken as column vectors in $C_{mod}$,  and respectively in $B_{mod}$ and then pick the $k^{th}$ of them which are highest than a certain threshold. Consequently we approximate the system with a $k$-order one with same dominant modal properties.
 
 The procedure to achieve modal truncation that we implemented in MATLAB is summarized below:
 \begin{itemize}
 \item [1.] solve the eigenvalue, eigenvector problem for $A$, i.e. $$ A = V\Lambda_AV^{-1}$$
 \item [2.] compute the modal transformed equivalent system $\Sigma_mod$ using $V$
-\item [3.] compute the coefficients $$\frac{\textbf{c}_{mod,1}\textbf{b}_{mod,1}^T}{\text{Re}(\lambda_i)}_{i=1,...,n}$$ and sort them ascendingly.
+\item [3.] compute the modal weighted coefficients $$m_i := \frac{\textbf{c}_{mod,1}\textbf{b}_{mod,1}^T}{\text{Re}(\lambda_i)}_{i=1,...,n}$$ and sort them ascendingly.
 \item [4.] pick the $k$ best coefficients and their corresponding eigenvalues and extract the corresponding matrices $A_{mod}^k$, $B_{mod}^k$, $C_{mod}^k$ by either recomputing with shuffled $V$ or by mere extraction of columns / rows.
 \end{itemize}
 
 \section{Model analysis \& reduction}
 In our analysis of the model introduced in Section 1, we used both methods summarized in Section 2 for different thresholds levels such as: $10^{-2}, 0.5\cdot10^{-2}, 10^{-3}$. The most interesting results and their comparisons are presented below, while the conclusions are drawn in the end.
 
+\subsection{General analysis}
+Prior to the reduction step, we determined whether or not we have to deal with a stable system or not. We did so by analyzing the eigenvalues of the matrix $A$, which were in fact the poles, or the modes, of our system. Thus, we solved the eigendecomposition of $A$ and obtained that all the poles were in the left half plane (see Figure ()). Consequently, the system was stable, and since $A$ was also diagonalizable,  we could directly apply both methods of approximation we have previously described without any problems. 
+
+In addition, we computed the controllability matrix $R_{n=17}(A,B)$ and the observability matrix $O_{n=17}(C,A)$, and then we determined their singular values in order to determine their ranks. The computation yielded that the singular values of the controllability matrix $R$ were $\sigma^{R}_i \geq 7.6576\cdot10^3 > 0$, and respectively that the  singular values of the observability matrix $O$ were $\sigma^{O}_i \geq 2.2413\cdot10^3 > 0$, and as a consequence both matrices were full rank and hence the system was both controllable and observable. Consequently, we had to analyze a \textbf{stable, controllable} and \textbf{observable} dynamic linear system.
+
+\subsection{System order reduction}
+In preparation for the reduction step using the two methods outlined, we computed the normalized Hankel singular values $\frac{\sigma_k}{\sigma_1}$, and respectively, the normalized modal coefficients $\frac{m_{k}}{m_{1}}$, for $k\leq n$, and then we plotted the results, see Figure (\ref{fig:svc_vs_k}).
+
+\begin{figure}[!ht]
+\centering
+\includegraphics[scale=0.5]{./figs/hsv_modc_vs_k}
+\caption{Normalized Hankel singular values and normalized modal coefficients vs. system order $k$}\label{fig:svc_vs_k}
+\end{figure}
+
+Figure (\ref{fig:svc_vs_k}) already provides quite some insight into the approximation capabilities of the reduced systems. For example, we remark the sudden drop after the first coefficient and then the flat regions for both methods up to $k = 9$ order. Around this region, the threshold value range suggested as a good candidate for our reduction problem, \cite{task}, is also situated. As a result, we ran three different reduction experiments, obtaining different reduced orders for them, see Table (\ref{tab:red}).
+
+\begin{table}[!ht]
+\centering
+\begin{tabular}{|c | c | c |}\hline
+Threshold $tol$ & Reduction order balanced transf. & Reduction order modal approx.\\\hline
+$10^{-2}$ & $7$ & $9$\\\hline
+$5\cdot10^{-3}$ & $ 8$ & $10$ \\\hline
+$10^{-3}$ & $11$& $12$\\\hline 
+\end{tabular}
+\caption{Reduction order for the balanced truncation and modal approximation given a threshold value}\label{tab:red}
+\end{table}
+
+However, given our problem and the plot from Figure (\ref{fig:svc_vs_k}), we will present in this report the required plots only for the last threshold considered as it was the most representative and also the most accurate by some distance with respect to the other two experimented. Nonetheless, the error norms of all the systems were computed and are tabulated at the end of this section.
+
+As a consequence, we reduced the initial system to a balanced transformed reduced system $\Sigma^{(11)}_{bal}$, and respectively to a modal approximated system $\Sigma^{(12)}_{mod}$. Furthermore, in order to observe how the transformation and truncation affected the modes of the original system, we plotted poles of the original system against the poles of the reduced systems. The plot is rendered in Figure (\ref{fig:poles}), where Subfigure (\ref{fig:poles_full}) shows all the poles of the systems, and respectively, where Subfigure (\ref{fig:poles_zoom}) shows a zoomed in version focusing on the poles that are more significant ($\text{Re}(\lambda_i)$ closer to $0$).
+
+\begin{figure}
+\centering
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{./figs/poles_full}
+  \caption{Full spread of poles --- including the two high poles at $-99.9795$ and $-99.9692$ of the original system plus the one at $-99.9741$ of the balancing reduced system}\label{fig:poles_full}
+\end{subfigure}%
+~
+\begin{subfigure}{.5\textwidth}
+  \centering
+  \includegraphics[width=.95\linewidth]{./figs/poles_zoom}
+  \caption{Zoomed in poles comparison --- most significant poles only with two poles close by identifiable almost as one for the original system at $-2.0015$ and at $-2.0124$}\label{fig:poles_zoom}
+\end{subfigure}
+\caption{Comparison of poles of original system versus reduced approximant systems}\label{fig:poles}
+\end{figure}
+
+From the plots of the poles, we remark that indeed the modal approximation keeps the poles of the system unchanged (as the yellow dots hit the center of the blue ones as expected) since this transformation diagonalizes $A$ preserving its eigenvalues even after reduction. On the other hand, the balancing transformation preserves the eigenvalues of the original $A$ through a similarity transformation, but after reduction these eigenvalues are not preserved anymore, drifting apart from their position as the matrix $A$ is not diagonalized by the balancing transformation and hence eigenvectors are not decoupled anymore, which yields these small differences in between the expected pole values and ones after the reduction of the balanced transformation. Hence, both methods preserve the original system's stability property.
+
+Furthermore, we remark that indeed the modal approximant tends to maintain the poles of the systems close to the real axis on the negative side as those are the significant ones for the transfer function of the system. Rarely happens that the residuals play a role for the poles of the reduced system, but even so, we observe this behavior in Subfigure (\ref{fig:poles_zoom}) for the poles further apart from the real axis, where this kind of behavior mind be expected. The balancing transformation keeps the poles that ensure that the easiest states to reach are also the easiest to observe. Of course most of them are the ones closer to the real axis, see Subfigure (\ref{fig:poles_zoom}), but there might also be poles further apart from the real axis, as in for the pole at $-99.9741$, see Subfigure (\ref{fig:poles_full}).
+
+
+
 \begin{thebibliography}{3}
 \bibitem {aa} A. Antoulas, Lecture Notes Model Order Reduction Course, Fall 2014, Jacobs University Bremen.
 \bibitem {task} A. Antoulas, Project guide , Model Order Reduction Course, Fall 2014, Jacobs University Bremen.
+\bibitem {matlab} MATLAB online documentation for Control System Toolbox and Robust Control Toolbox, \url{http://de.mathworks.com/help/index.html}.
+\bibitem {code} MATLAB project code, Github repository: \url{https://github.com/rstoica/mor_proj} as of December 3, 2014.
 \end{thebibliography}
 \end{document}
